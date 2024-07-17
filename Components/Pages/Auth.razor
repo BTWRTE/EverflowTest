@@ -1,0 +1,66 @@
+﻿@page "/events"
+
+@using EverflowTest.Business.Interfaces
+@using EverflowTest.Models
+@using Microsoft.AspNetCore.Authorization
+
+@inject IEventService EventService;
+
+@attribute [Authorize]
+
+<PageTitle>Events</PageTitle>
+
+<h1>Active Events</h1>
+
+<AuthorizeView>
+    @if (events == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>City</th>
+                    <th>PostCode</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var _event in events.OrderBy(e => e.StartDate))
+                {
+                    <tr>
+                        <td>@_event.Name</td>
+                        <td>@_event.Description</td>
+                        <td>@_event.StartDate.ToShortDateString()</td>
+                        <td>@_event.EndDate.ToShortDateString()</td>
+                        <td>@_event.City</td>
+                        <td>@_event.PostCode</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</AuthorizeView>
+
+@code {
+    private IEnumerable<EventViewModel>? events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        events = await EventService
+            .GetAll();
+    }
+
+    private class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public string? Summary { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}
